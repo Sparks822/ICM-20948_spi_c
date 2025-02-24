@@ -180,6 +180,8 @@ int main(void)
       // Set CS (Inactive High)
       HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_SET);
 
+      //Expected Output is : Who am i 0xea
+
 
   /* USER CODE END 2 */
 
