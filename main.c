@@ -23,7 +23,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "stdio.h"
-
+#include "icm206928_spi.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -144,43 +144,7 @@ int main(void)
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
 
-  // Delay for the SPI Device before setting CS PIN LOW
-
-  HAL_Delay(100); // Fixed: Was 'Hal_delay' (incorrect) → Changed to 'HAL_Delay' (correct)
-
-  //Set CS PIN TO LOW
-
-  // Reset CS (Active Low)
-  // Declare variables
-      uint8_t reg1, reg2, data;
-
-      // Reset CS (Active Low)
-      HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET);
-
-      reg1 = 0x7F;
-      data = 0;
-
-      HAL_SPI_Transmit(&hspi1, &reg1, 1, 100);
-      HAL_SPI_Transmit(&hspi1, &data, 1, 100);
-
-      // Set CS (Inactive High)
-      HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_SET);
-
-      HAL_Delay(100); // Fixed: Was 'Hal_delay' (incorrect) → Changed to 'HAL_Delay' (correct)
-
-      // Who am I register, page 36
-      HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET);
-
-      reg2 = 0x00 | 0x80;
-      HAL_SPI_Transmit(&hspi1, &reg2, 1, 100);
-      HAL_SPI_Receive(&hspi1, &data, 1, 100);
-
-      printf("Who am I 0x%x \n", data);
-
-      // Set CS (Inactive High)
-      HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_SET);
-
-      //Expected Output is : Who am i 0xea
+  icm206948_init();
 
 
   /* USER CODE END 2 */
