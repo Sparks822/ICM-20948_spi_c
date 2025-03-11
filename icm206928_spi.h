@@ -12,7 +12,7 @@
 #define  SELECT_BANK_REG  0x7F
 
 //Read WHO_AMI_REGISTER 
-#define WHO_AM_I 0X00
+#define WHO_AM_I 0x00
 
 //Initialize the IMU Sensor
 
