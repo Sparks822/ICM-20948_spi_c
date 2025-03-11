@@ -13,6 +13,10 @@ extern SPI_HandleTypeDef hspi1;  // Use the global SPI handle
 
 uint8_t reg;
 uint8_t bank0;
+uint8_t bank1;
+uint8_t bank2;
+uint8_t bank3;
+
 
 void icm206948_init(){  
   
