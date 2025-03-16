@@ -144,9 +144,9 @@ int main(void)
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
 
-  icm206948_init();
-
-
+  select_bank_0();
+  who_am_i();
+  wake_sensor();
   /* USER CODE END 2 */
 
   /* Infinite loop */
