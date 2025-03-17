@@ -19,7 +19,7 @@
 
 //PWR_MGMT_1 , page 37 , Located in bank 0
 
-#define PWR_MGMT_1    0x06   //Register Address
+#define PWR_MGMT_1    0x06   // 0x06 = 00000110 
 #define WHO_AM_I     0X00  //
 
 //Initialize the IMU Sensor
