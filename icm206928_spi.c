@@ -87,6 +87,7 @@ void wake_sensor() {
     printf("Before Wake-Up, PWR_MGMT_1: 0x%X\n", power_mgmt);
 
     // **Clear the SLEEP bit (bit 6) to wake the sensor**
+    // Register power_mgmt is 0x6 = 00000110 
     power_mgmt &= ~(1 << 6); // Wake up the sensor
 
     uint8_t reg_write = PWR_MGMT_1;  // DO NOT set MSB for write
