@@ -87,8 +87,8 @@ void wake_sensor() {
     printf("Before Wake-Up, PWR_MGMT_1: 0x%X\n", power_mgmt);
 
     // **Clear the SLEEP bit (bit 6) to wake the sensor**
-    // Register power_mgmt is 0x6 = 0000 0110 
-    // Reset value is 0x41 = 01000001
+    // Register power_mgmt address is 0x6 = 0000 0110 
+    // Register power_mgmt  Reset value is 0x41 = 01000001 during power up
     // (1 << 6) Shift bits 01000001 from 0100 0000 
     // ~(1 << 6) - invert all bits 0100 0000 = 1011 1111 
     //power_mgmt = 00000110  (binary)  = 0x06
