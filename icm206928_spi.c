@@ -74,7 +74,7 @@ void who_am_i() {
 
 #define PWR_MGMT_1    0x06   // Register address for power management 1
 
-void wake_sensor_clk_sel1() {
+void wake_sensor_clk_sel5() {
     select_bank_0();  // Ensure we are in Bank 0
 
     HAL_Delay(100);
