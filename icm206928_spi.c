@@ -71,7 +71,10 @@ void who_am_i() {
     return received_data;
 }
 
-void wake_sensor_clk_sel_1() {
+
+#define PWR_MGMT_1    0x06   // Register address for power management 1
+
+void wake_sensor_clk_sel1() {
     select_bank_0();  // Ensure we are in Bank 0
 
     HAL_Delay(100);
@@ -85,12 +88,10 @@ void wake_sensor_clk_sel_1() {
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_SET);
 
     // **Modify power_mgmt:**
-    // - Clear the SLEEP bit (bit 6)
-    // - Set CLKSEL[2:0] to 1 (0b001) (bits 2:0)
-    power_mgmt &= ~(1 << 6);  // Clear SLEEP bit
-    power_mgmt = (power_mgmt & ~0x07) | 0x01;  // Clear CLKSEL bits and set to 1
+    power_mgmt &= ~(1 << 6);  // Clear SLEEP bit (wake up)
+    power_mgmt = (power_mgmt & ~0x07) | 0x05;  // Set CLKSEL[2:0] = 5 (binary: 101)
 
-    uint8_t reg_write = PWR_MGMT_1;  // DO NOT set MSB for write
+    uint8_t reg_write = PWR_MGMT_1;  // Register address for writing
 
     // **Write back the modified PWR_MGMT_1 value**
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET);
@@ -98,9 +99,9 @@ void wake_sensor_clk_sel_1() {
     HAL_SPI_Transmit(&hspi1, &power_mgmt, 1, 100);
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_SET);
 
-    HAL_Delay(10); // Give the sensor time to process the wake-up
+    HAL_Delay(10); // Give the sensor time to process the changes
 
-    // **Verify wake-up by reading PWR_MGMT_1 again**
+    // **Verify wake-up and clock source**
     uint8_t verify = 0;
     reg_read = PWR_MGMT_1 | 0x80;  // Read PWR_MGMT_1 again
 
@@ -111,16 +112,17 @@ void wake_sensor_clk_sel_1() {
 
     // **Check if the sensor is awake**
     if ((verify & (1 << 6)) == 0) {
-        printf("Sensor is WAKE (SLEEP bit is cleared)\n");
+        printf("✅ Sensor is WAKE (SLEEP bit is cleared)\n");
     } else {
-        printf("Sensor is still in SLEEP mode! Check SPI communication.\n");
+        printf("❌ Sensor is still in SLEEP mode! Check SPI communication.\n");
     }
 
-    // **Verify if CLKSEL[2:0] is correctly set**
+    // **Check if CLKSEL[2:0] is correctly set to 5**
     uint8_t clksel = verify & 0x07;  // Extract CLKSEL bits
-    if (clksel >= 1 && clksel <= 5) {
-        printf("Clock source set correctly: CLKSEL = %d\n", clksel);
+    if (clksel == 5) {
+        printf("✅ Clock source set correctly: CLKSEL = %d\n", clksel);
     } else {
-        printf("Warning: CLKSEL[2:0] is not set correctly! Current value: %d\n", clksel);
+        printf("❌ Warning: CLKSEL[2:0] is not set correctly! Current value: %d\n", clksel);
     }
 }
+
