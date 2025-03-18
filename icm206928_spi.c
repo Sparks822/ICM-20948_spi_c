@@ -71,7 +71,7 @@ void who_am_i() {
     return received_data;
 }
 
-void wake_sensor() {
+void wake_sensor_clk_sel_1() {
     select_bank_0();  // Ensure we are in Bank 0
 
     HAL_Delay(100);
@@ -84,18 +84,11 @@ void wake_sensor() {
     HAL_SPI_Receive(&hspi1, &power_mgmt, 1, 100);
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_SET);
 
-    printf("Before Wake-Up, PWR_MGMT_1: 0x%X\n", power_mgmt);
-
-    // **Clear the SLEEP bit (bit 6) to wake the sensor**
-    // Register power_mgmt address is 0x6 = 0000 0110 
-    // Register power_mgmt  Reset value is 0x41 = 01000001 during power up
-    // (1 << 6) Shift bits 01000001 from 0100 0000 
-    // ~(1 << 6) - invert all bits 0100 0000 = 1011 1111 
-    //power_mgmt = 00000110  (binary)  = 0x06
-    //mask        = 10111111  (binary)  = 0xBF
-    ----------------------------------------
-    // Result      = 00000110  (binary)  = 0x06 
-    power_mgmt &= ~(1 << 6); // Wake up the sensor
+    // **Modify power_mgmt:**
+    // - Clear the SLEEP bit (bit 6)
+    // - Set CLKSEL[2:0] to 1 (0b001) (bits 2:0)
+    power_mgmt &= ~(1 << 6);  // Clear SLEEP bit
+    power_mgmt = (power_mgmt & ~0x07) | 0x01;  // Clear CLKSEL bits and set to 1
 
     uint8_t reg_write = PWR_MGMT_1;  // DO NOT set MSB for write
 
@@ -116,12 +109,18 @@ void wake_sensor() {
     HAL_SPI_Receive(&hspi1, &verify, 1, 100);
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_SET);
 
-    printf("After Wake-Up, PWR_MGMT_1: 0x%X\n", verify);
-
     // **Check if the sensor is awake**
     if ((verify & (1 << 6)) == 0) {
         printf("Sensor is WAKE (SLEEP bit is cleared)\n");
     } else {
         printf("Sensor is still in SLEEP mode! Check SPI communication.\n");
+    }
+
+    // **Verify if CLKSEL[2:0] is correctly set**
+    uint8_t clksel = verify & 0x07;  // Extract CLKSEL bits
+    if (clksel >= 1 && clksel <= 5) {
+        printf("Clock source set correctly: CLKSEL = %d\n", clksel);
+    } else {
+        printf("Warning: CLKSEL[2:0] is not set correctly! Current value: %d\n", clksel);
     }
 }
